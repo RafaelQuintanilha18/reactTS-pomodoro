@@ -9,11 +9,32 @@ import {
   TaskInput,
 } from './styles'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as zod from 'zod'
+
+const newCycleFormValidationSchema = zod.object({
+  task: zod.string().min(1, 'Insert your task'),
+  minutesAmount: zod
+    .number()
+    .min(5, 'Minimum cycle must be at least 5 minutes.')
+    .max(60, 'Maximum minutes cycle is 60 minutes.'),
+})
+
+interface NewCycleFormData {
+  task: string
+  minutesAmount: number
+}
 
 export function Home() {
-  const { register, handleSubmit, watch } = useForm()
+  const { register, handleSubmit, watch } = useForm<NewCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      minutesAmount: 5,
+      task: '',
+    },
+  })
 
-  function handleCreateNewCycle(data: any) {
+  function handleCreateNewCycle(data: NewCycleFormData) {
     console.log(data)
   }
 
@@ -32,9 +53,9 @@ export function Home() {
           />
 
           <datalist id="task-suggestions">
-            <option value="Projeto 1"></option>
-            <option value="Projeto 2"></option>
-            <option value="Projeto 3"></option>
+            <option value="Study"></option>
+            <option value="Work"></option>
+            <option value="Read"></option>
           </datalist>
 
           <label htmlFor=""> for </label>
@@ -45,7 +66,7 @@ export function Home() {
             step={5}
             min={5}
             max={60}
-            {...register('minutesAmout', { valueAsNumber: true })}
+            {...register('minutesAmount', { valueAsNumber: true })}
           />
           <span> minutes.</span>
         </FormContainer>
